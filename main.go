@@ -1,13 +1,16 @@
 package main
 
 import (
-    "github.com/gin-gonic/gin"
-    "github.com/dangvudev/HUBT_ExamS/config"
-    "github.com/dangvudev/HUBT_ExamS/routes"
+	"log"
+	"os"
 
-    swaggerFiles "github.com/swaggo/files"
-    ginSwagger "github.com/swaggo/gin-swagger"
-    _ "github.com/dangvudev/HUBT_ExamS/docs"
+	"github.com/dangvudev/HUBT_ExamS/config"
+	_ "github.com/dangvudev/HUBT_ExamS/docs"
+	"github.com/dangvudev/HUBT_ExamS/routes"
+	"github.com/gin-gonic/gin"
+	"github.com/joho/godotenv"
+	swaggerFiles "github.com/swaggo/files"
+	ginSwagger "github.com/swaggo/gin-swagger"
 )
 
 // @title HUBT Exam Storage API
@@ -18,6 +21,9 @@ import (
 
 // @schemes http
 func main() {
+    if err := godotenv.Load(); err != nil {
+        log.Println("No .env file found")
+    }
     config.ConnectDB()
 
     r := gin.Default()
@@ -25,6 +31,9 @@ func main() {
 
     // Swagger UI
     r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
-
-    r.Run(":8080")
+    port := os.Getenv("PORT")
+    if port == "" {
+        port = "8080"
+    }
+    r.Run(":" + port)
 }
