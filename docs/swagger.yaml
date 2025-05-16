@@ -1,0 +1,170 @@
+basePath: /
+definitions:
+  models.Exam:
+    properties:
+      author:
+        description: Tác giả
+        type: string
+      faculty:
+        description: Tên khoa
+        type: string
+      id:
+        type: string
+      questions:
+        description: Danh sách câu hỏi
+        items:
+          $ref: '#/definitions/models.Question'
+        type: array
+      subject:
+        description: Tên môn học
+        type: string
+      year:
+        description: Năm học
+        type: integer
+    type: object
+  models.ImageData:
+    properties:
+      base64:
+        description: Dữ liệu base64
+        type: string
+      fileType:
+        description: 'Đuôi file, ví dụ: jpg, png'
+        type: string
+    type: object
+  models.Question:
+    properties:
+      answer:
+        description: Đáp án đúng
+        type: string
+      content:
+        description: Đề bài
+        type: string
+      image:
+        allOf:
+        - $ref: '#/definitions/models.ImageData'
+        description: Hình ảnh nếu có
+      options:
+        description: Bộ đáp án
+        items:
+          type: string
+        type: array
+      title:
+        description: Tên câu hỏi
+        type: string
+    type: object
+host: localhost:8080
+info:
+  contact: {}
+  description: API quản lý đề thi của trường HUBT.
+  title: HUBT Exam Storage API
+  version: "1.0"
+paths:
+  /exams:
+    get:
+      description: Lấy tất cả các đề thi đã lưu
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.Exam'
+            type: array
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Lấy danh sách đề thi
+      tags:
+      - Exams
+    post:
+      consumes:
+      - application/json
+      description: 'Tải lên đề thi với đầy đủ thông tin: môn học, năm học, tác giả,
+        khoa và danh sách câu hỏi (có thể kèm hình ảnh)'
+      parameters:
+      - description: Dữ liệu đề thi đầy đủ
+        in: body
+        name: exam
+        required: true
+        schema:
+          $ref: '#/definitions/models.Exam'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Thông tin đề thi đã lưu
+          schema:
+            $ref: '#/definitions/models.Exam'
+        "400":
+          description: Dữ liệu gửi lên không hợp lệ hoặc thiếu trường bắt buộc
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Lỗi server trong quá trình lưu trữ
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Tải lên đề thi kèm câu hỏi
+      tags:
+      - Exams
+  /exams/{id}:
+    delete:
+      description: Xóa một đề thi dựa trên ID
+      parameters:
+      - description: ID của đề thi
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Đã xóa thành công
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: Không tìm thấy đề thi để xóa
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Xóa đề thi
+      tags:
+      - Exams
+    get:
+      description: Lấy chi tiết đề thi từ ID MongoDB
+      parameters:
+      - description: ID của đề thi
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Exam'
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Lấy đề thi theo ID
+      tags:
+      - Exams
+schemes:
+- http
+swagger: "2.0"

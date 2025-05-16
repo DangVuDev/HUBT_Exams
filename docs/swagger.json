@@ -1,0 +1,253 @@
+{
+    "schemes": [
+        "http"
+    ],
+    "swagger": "2.0",
+    "info": {
+        "description": "API quản lý đề thi của trường HUBT.",
+        "title": "HUBT Exam Storage API",
+        "contact": {},
+        "version": "1.0"
+    },
+    "host": "localhost:8080",
+    "basePath": "/",
+    "paths": {
+        "/exams": {
+            "get": {
+                "description": "Lấy tất cả các đề thi đã lưu",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Exams"
+                ],
+                "summary": "Lấy danh sách đề thi",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/models.Exam"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            },
+            "post": {
+                "description": "Tải lên đề thi với đầy đủ thông tin: môn học, năm học, tác giả, khoa và danh sách câu hỏi (có thể kèm hình ảnh)",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Exams"
+                ],
+                "summary": "Tải lên đề thi kèm câu hỏi",
+                "parameters": [
+                    {
+                        "description": "Dữ liệu đề thi đầy đủ",
+                        "name": "exam",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.Exam"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Thông tin đề thi đã lưu",
+                        "schema": {
+                            "$ref": "#/definitions/models.Exam"
+                        }
+                    },
+                    "400": {
+                        "description": "Dữ liệu gửi lên không hợp lệ hoặc thiếu trường bắt buộc",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Lỗi server trong quá trình lưu trữ",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/exams/{id}": {
+            "get": {
+                "description": "Lấy chi tiết đề thi từ ID MongoDB",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Exams"
+                ],
+                "summary": "Lấy đề thi theo ID",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "ID của đề thi",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/models.Exam"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "description": "Xóa một đề thi dựa trên ID",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Exams"
+                ],
+                "summary": "Xóa đề thi",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "ID của đề thi",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Đã xóa thành công",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Không tìm thấy đề thi để xóa",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "definitions": {
+        "models.Exam": {
+            "type": "object",
+            "properties": {
+                "author": {
+                    "description": "Tác giả",
+                    "type": "string"
+                },
+                "faculty": {
+                    "description": "Tên khoa",
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "questions": {
+                    "description": "Danh sách câu hỏi",
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/models.Question"
+                    }
+                },
+                "subject": {
+                    "description": "Tên môn học",
+                    "type": "string"
+                },
+                "year": {
+                    "description": "Năm học",
+                    "type": "integer"
+                }
+            }
+        },
+        "models.ImageData": {
+            "type": "object",
+            "properties": {
+                "base64": {
+                    "description": "Dữ liệu base64",
+                    "type": "string"
+                },
+                "fileType": {
+                    "description": "Đuôi file, ví dụ: jpg, png",
+                    "type": "string"
+                }
+            }
+        },
+        "models.Question": {
+            "type": "object",
+            "properties": {
+                "answer": {
+                    "description": "Đáp án đúng",
+                    "type": "string"
+                },
+                "content": {
+                    "description": "Đề bài",
+                    "type": "string"
+                },
+                "image": {
+                    "description": "Hình ảnh nếu có",
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/models.ImageData"
+                        }
+                    ]
+                },
+                "options": {
+                    "description": "Bộ đáp án",
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "title": {
+                    "description": "Tên câu hỏi",
+                    "type": "string"
+                }
+            }
+        }
+    }
+}
